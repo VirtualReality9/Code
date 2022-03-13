@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.RoleMapper">
+    <resultMap id="QueryRole" type="Role">
+        <id property="roleId" column="roleId" />
+        <result property="roleName" column="roleName" />
+        <result property="roleStatus" column="roleStatus" />
+        <result property="roleCreateTime" column="roleCreateTime" />
+        <result property="roleRemark" column="roleRemark" />
+        <collection property="permissions" ofType="Permission">
+            <id property="permissionId" column="permissionId" />
+            <result property="permissionName" column="permissionName" />
+        </collection>
+    </resultMap>
+    <select id="queryRoleById" resultMap="QueryRole" parameterType="Integer">
+        select * from role r, role_permission rp, permission p
+        where r.roleId = rp.roleId and rp.permissionId = p.permissionId and r.roleId = #{id}
+    </select>
+<!--查询全部Role-->
+<!--    <resultMap id="QueryRole" type="Role">-->
+<!--        <id property="roleId" column="roleId" />-->
+<!--        <result property="roleName" column="roleName"/>-->
+<!--    </resultMap>-->
+    <select id="queryRole" resultType="Role">
+        select * from role;
+    </select>
+<!--通过Id查询Role-->
+<!--    <select id="queryRoleById" resultType="Role" parameterType="Integer">-->
+<!--        select * from role where roleId = #{roleId}-->
+<!--    </select>-->
+<!--通过Name查询Role-->
+    <resultMap id="QueryRoleByName" type="Role">
+        <id property="roleId" column="roleId" />
+        <result property="roleName" column="roleName" />
+    </resultMap>
+    <select id="queryRoleByName" resultMap="QueryRoleByName" parameterType="String">
+        select * from role where roleName = #{roleName}
+    </select>
+<!--增加Role-->
+    <insert id="addRole" parameterType="Map" useGeneratedKeys="true" keyProperty="roleId">
+        insert into role
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <!--<if test="roleId != null">-->
+            <!--    roleId,-->
+            <!--</if>-->
+            <if test="roleName != null">
+                roleName,
+            </if>
+            <if test="roleStatus != null">
+                roleStatus,
+            </if>
+            <if test="roleCreateTime != null">
+                roleCreateTime,
+            </if>
+            <if test="roleRemark != null">
+                roleRemark,
+            </if>
+            <if test="roleLevel != null">
+                roleLevel,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="roleName != null">
+                #{roleName},
+            </if>
+            <if test="roleStatus != null">
+                #{roleStatus},
+            </if>
+            <if test="roleCreateTime != null">
+                #{roleCreateTime},
+            </if>
+            <if test="roleRemark != null">
+                #{roleRemark},
+            </if>
+            <if test="roleLevel != null">
+                #{roleLevel},
+            </if>
+        </trim>
+    </insert>
+<!--修改Role-->
+    <update id="updateRole" parameterType="Map">
+        update role
+        <trim prefix="set" suffixOverrides=",">
+            <if test="roleName != null">
+                roleName = #{roleName},
+            </if>
+            <if test="roleStatus != null">
+                roleStatus = #{roleStatus},
+            </if>
+            <if test="roleCreateTime != null">
+                roleCreateTime = #{roleCreateTime},
+            </if>
+            <if test="roleRemark != null">
+                roleRemark = #{roleRemark},
+            </if>
+            <if test="roleLevel != null">
+                roleLevel = #{roleLevel},
+            </if>
+        </trim>
+        where roleId = #{roleId}
+    </update>
+<!--删除Role-->
+    <delete id="deleteRole" parameterType="Integer[]">
+        delete from role where roleId in
+        <foreach collection="array" item="roleId" open="("
+                 separator="," close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+</mapper>

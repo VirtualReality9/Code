@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.ScheduleAttachmentMapper">
+
+    <insert id="addAttachment" parameterType="Map" useGeneratedKeys="true" keyProperty="attachmentId">
+        insert into schedule_attachment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="UUID != null">
+                UUID,
+            </if>
+            <if test="attachmentName != null">
+                attachmentName,
+            </if>
+            <if test="attachmentUrl != null">
+                attachmentUrl,
+            </if>
+            <if test="scheduleId != null">
+                scheduleId,
+            </if>
+            <if test="employeeId != null">
+                employeeId,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="UUID != null">
+                #{UUID},
+            </if>
+            <if test="attachmentName != null">
+                #{attachmentName},
+            </if>
+            <if test="attachmentUrl != null">
+                #{attachmentUrl},
+            </if>
+            <if test="scheduleId != null">
+                #{scheduleId},
+            </if>
+            <if test="employeeId != null">
+                #{employeeId},
+            </if>
+        </trim>
+    </insert>
+    <select id="queryAttachment" resultType="ScheduleAttachment" parameterType="Map">
+        select * from schedule_attachment
+        <where>
+            <if test="scheduleId != null">
+                scheduleId = #{scheduleId}
+            </if>
+            <if test="employeeId != null">
+                and employeeId = #{employeeId}
+            </if>
+        </where>
+    </select>
+    <update id="updateAttachment" parameterType="Map">
+        update schedule_attachment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="attachmentName != null">
+                attachmentName = #{attachmentName},
+            </if>
+            <if test="attachmentUrl != null">
+                attachmentUrl = #{attachmentUrl},
+            </if>
+        </trim>
+        where attachmentId = #{attachmentId}
+    </update>
+    <delete id="deleteCompanyCard" parameterType="Map">
+        delete from schedule_attachment
+        <where>
+            <if test="attachmentId != null">
+                attachmentId = #{attachmentId}
+            </if>
+            <if test="attachmentName != null">
+                and attachmentName = #{attachmentName}
+            </if>
+            <if test="attachmentUrl != null">
+                and attachmentUrl = #{attachmentUrl}
+            </if>
+            <if test="documentId != null">
+                and employeeId = #{employeeId}
+            </if>
+        </where>
+    </delete>
+
+</mapper>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.LogMapper">
+    <select id="findAllLog" parameterType="map" resultType="log">
+        select * from log order by logId desc limit ${(pageNum - 1) * pageSize},#{pageSize};
+    </select>
+
+    <select id="countAllLog"  resultType="Integer">
+        select count(*) from log;
+    </select>
+
+    <delete id="deleteAllLog" parameterType="string">
+        delete from log where 1 = 1;
+    </delete>
+
+    <select id="findLogByMessage" parameterType="map" resultType="HashMap">
+        select *  from log where message like concat('%',#{message},'%');
+    </select>
+    <select id="countFindLogsByMessage" parameterType="string" resultType="Integer">
+        select count(*)  from log where message like concat('%',#{message},'%');
+    </select>
+</mapper>

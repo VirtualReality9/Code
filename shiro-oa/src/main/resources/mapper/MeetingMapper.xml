@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.MeetingMapper">
+
+    <resultMap id="MEETING_MEETING_ROOM" type="Meeting">
+        <id property="meetingId" column="meetingId" />
+        <result property="meetingName" column="meetingName" />
+        <result property="meetingStatus" column="meetingStatus" />
+        <result property="meetingStartEndTime" column="meetingStartEndTime" />
+        <result property="meetingContent" column="meetingContent" />
+        <result property="meetingRemark" column="meetingRemark" />
+        <result property="meetingNote" column="meetingNote" />
+        <result property="meetingRoomId" column="meetingRoomId" />
+        <result property="applicantId" column="applicantId" />
+        <result property="applicantName" column="applicantName" />
+        <result property="applicantDepartment" column="applicantDepartment" />
+        <result property="applyDate" column="applyDate" />
+        <association property="meetingRoom" javaType="MeetingRoom">
+            <id property="meetingRoomId" column="meetingRoomId" />
+            <result property="meetingRoomName" column="meetingRoomName" />
+            <result property="meetingRoomCreateTime" column="meetingRoomCreateTime" />
+            <result property="meetingRoomEndTime" column="meetingRoomEndTime" />
+            <result property="maxSize" column="maxSize" />
+        </association>
+    </resultMap>
+    <select id="examineMeetingList" parameterType="Map" resultMap="MEETING_MEETING_ROOM">
+        select * from meeting m,meetingroom mr
+        where meetingStatus = 1 and m.meetingRoomId = mr.meetingRoomId
+        limit ${(pageNum - 1) * pageSize},#{pageSize};
+    </select>
+    <select id="countMeetingList" resultType="Integer">
+        select count(*) from meeting where meetingStatus = 1
+    </select>
+    <select id="queryHasExaminedMeeting" parameterType="Map" resultMap="MEETING_MEETING_ROOM">
+        select * from meeting m,meetingroom mr
+        where meetingId in(select meetingId from meeting where meetingStatus = 0 or meetingStatus = 2)
+        and m.meetingRoomId = mr.meetingRoomId
+        limit ${(pageNum - 1) * pageSize},#{pageSize};
+    </select>
+    <!--根据指定的员工ID查找所有参加的会议-->
+    <select id="findAllMeetingById" parameterType="Map" resultMap="MEETING_MEETING_ROOM">
+        select * from meeting m,meetingroom mr,employee_meeting em
+        where m.meetingRoomId = mr.meetingRoomId and #{employeeId} = em.employeeId and em.meetingId = m.meetingId
+        limit ${(pageNum - 1) * pageSize},#{pageSize};
+    </select>
+    <select id="countHasExaminedMeetingList" parameterType="Map" resultType="Integer">
+        select count(*) from meeting where meetingStatus = 0 or meetingStatus = 2
+    </select>
+    <select id="countEmployeeMeetingList" parameterType="Map" resultType="Integer">
+        select count(*) from meeting m,employee_meeting em
+        <where>
+            <if test="meetingStatus != null">
+                meetingStatus = #{meetingStatus}
+            </if>
+            <if test="meetingName != null">
+                AND meetingName = #{meetingName}
+            </if>
+            <if test="applyDate != null">
+                AND applyDate = #{applyDate}
+            </if>
+            <if test="employeeId != null">
+                AND em.employeeId = #{employeeId}
+                AND m.meetingId = em.meetingId
+            </if>
+        </where>
+    </select>
+    <!--根据meetingroomid查询会议室信息-->
+    <select id="selectMeetingRoomById" parameterType="int" resultType="Meeting">
+        select * from meeting where meetingRoomId=#{meetingRoomId}
+        and meetingStatus != 0;
+    </select>
+
+    <select id="queryMeetingByDate" parameterType="String" resultType="Meeting">
+        select * from meeting where applyDate = #{Date}
+    </select>
+    <!--更改会议室信息-->
+    <update id="updateMeetingRoom" parameterType="Map">
+        update test.meetingroom
+        <trim prefix="set" suffixOverrides=",">
+            <if test="meetingRoomName!=null">
+                meetingRoomName=#{meetingRoomName},
+            </if>
+            <if test="meetingRoomStatus!=null">
+                meetingRoomStatus=#{meetingRoomStatus}
+            </if>
+        </trim>
+        where meetingRoomId=#{meetingRoomId}
+    </update>
+
+    <!--根据传入的Map值进行匹配查询，返回meeting-->
+    <select id="getMeetingIdByMap" resultType="Meeting" parameterType="Map">
+        select * from test.meeting
+        <where>
+            <if test="meetingId!=null">
+                meetingId=#{meetingId}
+            </if>
+            <if test="meetingName!=null">
+                and meetingName=#{meetingName}
+            </if>
+            <if test="meetingStatus!=null">
+                and meetingStatus=#{meetingStatus}
+            </if>
+            <if test="meetingStartEndTime!=null">
+                and meetingStartEndTime=#{meetingStartEndTime}
+            </if>
+            <if test="meetingContent!=null">
+                and meetingContent=#{meetingContent}
+            </if>
+            <if test="meetingRemark!=null">
+                and meetingRemark=#{meetingRemark}
+            </if>
+            <if test="meetingNote!=null">
+                and meetingNote=#{meetingNote}
+            </if>
+            <if test="meetingRoomId!=null">
+                and meetingRoomId=#{meetingRoomId}
+            </if>
+        </where>
+    </select>
+
+    <!--会议表中添加会议-->
+    <insert id="addMeeting" parameterType="Map" useGeneratedKeys="true" keyProperty="meetingId">
+        insert into meeting
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <!--<if test="roleId != null">-->
+            <!--    roleId,-->
+            <!--</if>-->
+            <if test="meetingName != null">
+                meetingName,
+            </if>
+            <if test="meetingStartEndTime != null">
+                meetingStartEndTime,
+            </if>
+            <if test="meetingContent != null">
+                meetingContent,
+            </if>
+            <if test="meetingRemark != null">
+                meetingRemark,
+            </if>
+            <if test="meetingStatus != null">
+                meetingStatus,
+            </if>
+            <if test="meetingNote != null">
+                meetingNote,
+            </if>
+            <if test="meetingRoomId != null">
+                meetingRoomId,
+            </if>
+            <if test="applicantId != null">
+                applicantId,
+            </if>
+            <if test="applicantName != null">
+                applicantName,
+            </if>
+            <if test="applicantDepartment != null">
+                applicantDepartment,
+            </if>
+            <if test="meetingSlot != null">
+                meetingSlot,
+            </if>
+            <if test="applyDate != null">
+                applyDate,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="meetingName != null">
+                #{meetingName},
+            </if>
+            <if test="meetingStartEndTime != null">
+                #{meetingStartEndTime},
+            </if>
+            <if test="meetingContent != null">
+                #{meetingContent},
+            </if>
+            <if test="meetingRemark != null">
+                #{meetingRemark},
+            </if>
+            <if test="meetingStatus != null">
+                #{meetingStatus},
+            </if>
+            <if test="meetingNote != null">
+                #{meetingNote},
+            </if>
+            <if test="meetingRoomId != null">
+                #{meetingRoomId},
+            </if>
+            <if test="applicantId != null">
+                #{applicantId},
+            </if>
+            <if test="applicantName != null">
+                #{applicantName},
+            </if>
+            <if test="applicantDepartment != null">
+                #{applicantDepartment},
+            </if>
+            <if test="meetingSlot != null">
+                #{meetingSlot},
+            </if>
+            <if test="applyDate != null">
+                #{applyDate},
+            </if>
+        </trim>
+    </insert>
+
+    <!--向employee_meeting表添加参加会议信息-->
+    <insert id="addMeetingEmployee" parameterType="Map">
+        insert into employee_meeting values(#{employeeId},#{meetingId})
+    </insert>
+    <!--删除与会人员-->
+    <delete id="deleteMeetingEmployee" parameterType="Integer">
+        delete from employee_meeting where meetingId = #{meetingId}
+    </delete>
+
+    <update id="updateMeetingStatus" parameterType="Map">
+        update meeting
+        <set>
+            <if test="meetingStatus!= null">
+                meetingStatus=#{meetingStatus},
+            </if>
+            <if test="meetingRemark = null">
+                meetingStatus=#{meetingRemark},
+            </if>
+        </set>
+        where meetingId=#{meetingId}
+    </update>
+    <!--修改meeting表中的信息-->
+    <update id="UpdateMeeting" parameterType="Map">
+        update meeting
+        <set>
+            <if test="meetingName!=null">
+                meetingName=#{meetingName},
+            </if>
+            <if test="meetingStartEndTime!=null">
+                meetingStartEndTime=#{meetingStartEndTime},
+            </if>
+            <if test="meetingContent!=null">
+                meetingContent=#{meetingContent},
+            </if>
+            <if test="meetingRemark!=null">
+                meetingRemark=#{meetingRemark},
+            </if>
+            <if test="meetingNote!=null">
+                meetingNote=#{meetingNote},
+            </if>
+            <if test="meetingRoomId!=null">
+                meetingRoomId=#{meetingRoomId}
+            </if>
+        </set>
+        where meetingId=#{meetingId}
+    </update>
+
+    <!--根据meetingId更新会议表中meetingStatus的状态为1，表示会议已结束-->
+    <update id="examineMeetingStatus" parameterType="Integer">
+        update meeting set meetingStatus=#{meetingStatus} where meetingId=#{meetingId}
+    </update>
+
+    <!--取消会议，，，根据meetingId删除employee_meeting表中的信息-->
+    <delete id="deleteMeetingEmployeeByMap" parameterType="Integer">
+        delete from employee_meeting
+        <where>
+            <if test="meetingId!=null">
+                meetingId=#{meetingId}
+            </if>
+        </where>
+    </delete>
+
+    <!--取消会议，，，根据meetingId删除会议表中的信息-->
+    <delete id="deleteMeetingByMeetingId" parameterType="int">
+        delete from meeting where meetingId=#{meetingId};
+    </delete>
+
+</mapper>

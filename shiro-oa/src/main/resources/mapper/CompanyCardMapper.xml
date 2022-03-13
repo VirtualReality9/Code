@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.CompanyCardMapper">
+
+    <insert id="addCompanyCard" parameterType="String">
+        insert into company_card
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+        <!--<if test="roleId != null">-->
+        <!--    roleId,-->
+        <!--</if>-->
+        <if test="ccContent != null">
+            ccContent,
+        </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="meetingStartEndTime != null">
+                #{ccContent},
+            </if>
+        </trim>
+    </insert>
+    <select id="queryCompanyCard" resultType="CompanyCard">
+        select * from company_card
+    </select>
+    <delete id="deleteCompanyCard" parameterType="Integer">
+        delete from company_card where ccId=#{ccId};
+    </delete>
+
+</mapper>

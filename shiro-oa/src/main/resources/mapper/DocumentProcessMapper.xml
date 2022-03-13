@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.DocumentProcessMapper">
+
+    <resultMap id="QueryDocumentProcess" type="Document">
+        <id property="documentId" column="documentId" />
+        <collection property="processList" ofType="Process">
+            <id property="processId" column="processId" />
+            <result property="processName" column="processName" />
+            <result property="processCreateTime" column="processCreateTime" />
+            <result property="processStatus" column="processStatus" />
+            <result property="processNote" column="processNote" />
+            <result property="processTime" column="processTime" />
+            <result property="processEmployeeName" column="processEmployeeName" />
+            <result property="order" column="order" />
+        </collection>
+    </resultMap>
+    <select id="queryDocumentProcess" parameterType="Integer" resultMap="QueryDocumentProcess">
+        select * from employee_document ed, process p
+        where ed.processId = p.processId and documentId = #{documentId}
+        order by p.processOrder
+    </select>
+
+    <insert id="addEmployeeProcess" parameterType="Map">
+        insert into employee_document
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <!--<if test="roleId != null">-->
+            <!--    roleId,-->
+            <!--</if>-->
+            <if test="processId != null">
+                processId,
+            </if>
+            <if test="processEmployeeId != null">
+                processEmployeeId,
+            </if>
+            <if test="documentId != null">
+                documentId,
+            </if>
+            <if test="processEmployeeName != null">
+                processEmployeeName,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="processId != null">
+                #{processId},
+            </if>
+            <if test="processEmployeeId != null">
+                #{processEmployeeId},
+            </if>
+            <if test="documentId != null">
+                #{documentId},
+            </if>
+            <if test="processEmployeeName != null">
+                #{processEmployeeName},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateEmployeeProcess" parameterType="Map">
+        update process
+        <trim prefix="set" suffixOverrides=",">
+            <if test="processEmployeeId != null">
+                processEmployeeId = #{processEmployeeId},
+            </if>
+            <if test="processCreateTime != null">
+                processEmployeeName = #{processEmployeeName},
+            </if>
+        </trim>
+        where processId = #{processId}
+    </update>
+
+    <!--删除流程-->
+    <delete id="deleteEmployeeProcess" parameterType="Integer[]">
+        delete from employee_process where processId in
+        <foreach collection="array" item="roleId" open="("
+                 separator="," close=")">
+            #{processId}
+        </foreach>
+    </delete>
+</mapper>

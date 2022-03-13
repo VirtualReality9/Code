@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.PermissionMapper">
+    <resultMap type="Permission" id="PERMISSION_MAP">
+        <id property="pid" column="pid" />
+        <result property="pname" column="pname" />
+        <result property="keyword" column="keyword" />
+        <result property="description" column="description" />
+    </resultMap>
+    <select id="getPermissions" resultMap="PERMISSION_MAP">
+        select * from oa.permission;
+    </select>
+    <resultMap type="NavigationBar" id="USER_ROLE_NAVIGATION_MAP">
+        <id column="T1" property="nbid"/>
+        <result column="N1" property="navname"/>
+        <result column="O1" property="order" />
+        <result column="P1" property="path" />
+        <collection property="childList" ofType="NavigationBar">
+                <id column="T2" property="nbid"/>
+                <result column="N2" property="navname"/>
+                <result column="O2" property="order" />
+                <result column="Node" property="fatherNode"/>
+                <result column="P2" property="path" />
+                <result column="Perm" property="permissionId" />
+        </collection>
+    </resultMap>
+    <select id="getNavigationBars" resultMap="USER_ROLE_NAVIGATION_MAP">
+        select TT.T1, TT.T2,TT.Node,TT.N1,TT.N2,TT.O1,TT.O2,TT.P1,TT.P2,TT.Perm
+                from (
+                select m1.nbid T1, m2.nbid T2,m2.fatherNode Node,m1.navname N1,m2.navname N2,m1.order O1,m2.order O2,m1.path P1,m2.path P2,m2.permissionId Perm
+                    from navigationbar2 m1
+                    left join navigationbar2 m2 on m1.nbid = m2.fatherNode
+                where m1.level = '1' )
+            TT , role_navigationbar2 rel
+            where TT.T2 = rel.nbid
+            group by TT.T2,TT.O1
+            order by TT.O2,TT.O1
+    </select>
+</mapper>

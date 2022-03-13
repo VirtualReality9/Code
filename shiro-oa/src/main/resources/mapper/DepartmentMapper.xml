@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.DepartmentMapper">
+    <resultMap id="QueryDepartment" type="Department">
+        <id property="departmentId" column="departmentId" />
+        <result property="departmentName" column="departmentName" />
+        <!--<collection property="employeeList" ofType="Employee">-->
+        <!--    <id property="employeeId" column="employeeId" />-->
+        <!--    <result property="employeeName" column="employeeName" />-->
+        <!--</collection>-->
+    </resultMap>
+    <select id="queryDepartment" resultType="Department" parameterType="Integer">
+        select * from department
+        <where>
+            <if test="departmentId != null">
+                and departmentId != #{departmentId}
+            </if>
+        </where>
+    </select>
+    <resultMap type="Department" id="DEPARTMENT_EMPLOYEE_MAP">
+        <id column="departmentId" property="departmentId"/>
+        <result property="departmentName" column="departmentName" />
+        <collection property="employeeList" ofType="Employee">
+            <id column="employeeId" property="employeeId"/>
+            <result column="employeeName" property="employeeName"/>
+            <result column="userPhone" property="userPhone"/>
+            <result column="employeeEmail" property="employeeEmail"/>
+        </collection>
+    </resultMap>
+    <!--查询比自己低级的员工并分配待办事项-->
+    <select id="queryEmployeeByRoleLevel" parameterType="Map" resultMap="DEPARTMENT_EMPLOYEE_MAP">
+        select employeeId,employeeName,d.departmentId,departmentName,r.roleLevel,e.userPhone,employeeEmail
+        from employee e,user_employee ue,user u,user_role ur,role r,department d
+        where e.employeeId = ue.employeeIdOne and u.userId = ue.userIdOne and u.userId = ur.userIdTwo and r.roleId = ur.roleIdOne and d.departmentId = e.departmentId
+        <if  test=" roleLevel != null" >
+            and r.roleLevel &lt; #{roleLevel}
+        </if>
+        <if test=" departmentId != null">
+            and d.departmentId = #{departmentId}
+        </if>
+        order by departmentId
+    </select>
+    <select id="queryDepartmentEmployee" resultMap="DEPARTMENT_EMPLOYEE_MAP" parameterType="Integer">
+        select * from department d,employee e
+        where d.departmentId = e.departmentId and employeeId != #{employeeId}
+        ORDER BY d.departmentId
+    </select>
+    <select id="queryAllDepartmentEmployee" resultMap="DEPARTMENT_EMPLOYEE_MAP" parameterType="Map">
+        select * from department d,employee e
+        where d.departmentId = e.departmentId
+        <if test="employeeId != null">
+            and employeeId = #{employeeId}
+        </if>
+        <if test="employeeId != null">
+            and employeeName = #{employeeName}
+        </if>
+        ORDER BY d.departmentId
+        <if test="pagesize != null">
+            <if test="pagenum != null">
+                limit ${(pagenum - 1) * pagesize},#{pagesize};
+            </if>
+        </if>
+    </select>
+    <select id="queryDepartmentById" resultType="Department" parameterType="Integer">
+        select * from department where departmentId = #{departmentId}
+    </select>
+    <insert id="addDepartment" parameterType="Map">
+        insert into department
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <!--<if test="roleId != null">-->
+            <!--    roleId,-->
+            <!--</if>-->
+            <if test="departmentName != null">
+                departmentName,
+            </if>
+            <if test="departmentStatus != null">
+                departmentStatus,
+            </if>
+            <if test="departmentManager != null">
+                departmentManager,
+            </if>
+            <if test="departmentSize != null">
+                departmentSize,
+            </if>
+            <if test="departmentPhone != null">
+                departmentPhone,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="departmentName != null">
+                #{departmentName},
+            </if>
+            <if test="departmentStatus != null">
+                #{departmentStatus},
+            </if>
+            <if test="departmentManager != null">
+                #{departmentManager},
+            </if>
+            <if test="departmentSize != null">
+                #{departmentSize},
+            </if>
+            <if test="departmentPhone != null">
+                #{departmentPhone},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateDepartment" parameterType="Map">
+        update department
+        <trim prefix="set" suffixOverrides=",">
+            <if test="departmentName != null">
+                departmentName = #{departmentName},
+            </if>
+            <if test="departmentPhone != null">
+                departmentPhone = #{departmentPhone},
+            </if>
+            <if test="departmentStatus != null">
+                departmentStatus = #{departmentStatus},
+            </if>
+            <if test="departmentManager != null">
+                departmentManager = #{departmentManager},
+            </if>
+            <if test="departmentSize != null">
+                departmentSize = #{departmentSize},
+            </if>
+        </trim>
+        where departmentId = #{departmentId}
+    </update>
+    <delete id="deleteDepartment" parameterType="Int">
+        delete from department where departmentId = #{departmentId};
+    </delete>
+</mapper>

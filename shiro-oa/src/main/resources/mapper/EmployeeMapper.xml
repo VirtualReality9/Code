@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.EmployeeMapper">
+    <!--    查询员工-->
+    <!--    <resultMap id="QueryEmployee" type="com.xb.pojo.Employee">-->
+    <!--        <id property="employeeId" column="employeeId" />-->
+    <!--        <result property="employeeName" column="employeeName" />-->
+    <!--    </resultMap>-->
+    <!--    <select id="queryEmployee" resultMap="QueryEmployee">-->
+    <!--        select * from employee;-->
+    <!--    </select>-->
+    <!--    查询员工-->
+    <!--<result property="userId" column="userId" />-->
+    <resultMap id="QueryEmployeeDepartment" type="Employee">
+        <id property="employeeId" column="employeeId" />
+        <result property="employeeName" column="employeeName" />
+        <result property="userPhone" column="userPhone" />
+        <result property="employeeAge" column="employeeAge" />
+        <result property="employeeSex" column="employeeSex" />
+        <result property="employeePosition" column="employeePosition" />
+        <result property="employeeEmail" column="employeeEmail" />
+        <result property="employeeBirth" column="employeeBirth" />
+        <association property="department" javaType="Department">
+            <id property="departmentId" column="departmentId" />
+            <result property="departmentName" column="departmentName" />
+        </association>
+    </resultMap>
+    <select id="queryEmployeeByUserId" parameterType="Integer" resultType="Employee">
+        select * from employee e,user u,user_employee ue where userId = #{userId} and e.employeeId = ue.employeeIdOne and ue.userIdOne = u.userId
+    </select>
+    <select id="queryEmployeeDepartment" resultMap="QueryEmployeeDepartment">
+--         select * from employee e,employee_department ed,department d
+--         where e.employeeId=ed.employeeId and ed.departmentId=d.departmentId
+            select * from employee e, department d
+            where e.departmentId = d.departmentId
+            order by e.employeeId
+    </select>
+    <!--查询员工部门-->
+    <resultMap id="EmployeeDepartment" type="Employee">
+        <id property="employeeId" column="employeeId" />
+        <result property="employeeName" column="employeeName" />
+        <result property="userPhone" column="userPhone" />
+        <association property="department" javaType="Department">
+            <id property="departmentId" column="departmentId" />
+            <result property="departmentName" column="departmentName" />
+        </association>
+    </resultMap>
+    <select id="queryUserDepartment" parameterType="Integer" resultMap="EmployeeDepartment">
+        select * from employee e, department d
+            where e.departmentId = d.departmentId and e.employeeId = #{employeeId}
+    </select>
+    <select id="queryEmployeeByDepartmentId" parameterType="Integer" resultType="Employee">
+            select * from employee e,department d
+            where e.departmentId = d.departmentId and d.departmentId = #{departmentId}
+            order by e.employeeId
+    </select>
+    <select id="queryEmployeeAddressByDepartmentId" parameterType="Map" resultType="Employee">
+            select * from employee e,department d
+            where e.departmentId = d.departmentId
+            <if test="departmentId != null">
+                and d.departmentId = #{departmentId}
+            </if>
+            <if test="employeeName != null">
+                and employeeName = #{employeeName}
+            </if>
+            <if test="employeeId != null">
+                and employeeId = #{employeeId}
+            </if>
+            order by e.employeeId
+            <if test="pagenum != null">
+                <if test="pagesize != null">
+                    limit ${(pagenum - 1) * pagesize},#{pagesize};
+                </if>
+            </if>
+    </select>
+    <select id="countDepartmentEmployee" parameterType="Map" resultType="Integer">
+        select count(*) from employee where departmentId= #{departmentId}
+    </select>
+    <select id="queryEmployeeAllById" resultType="Employee">
+        select * from employee
+        where employeeId = #{id};
+    </select>
+    <select id="queryEmployeeById" resultMap="QueryEmployeeDepartment">
+        select * from employee e, department d
+        where e.departmentId = d.departmentId
+        and e.employeeId = #{employeeId}
+        order by e.employeeId
+    </select>
+    <select id="queryEmployeeByName" resultMap="QueryEmployeeDepartment">
+                select * from employee e, department d
+        where e.departmentId = d.departmentId
+        and e.employeeName = #{employeeName}
+        order by e.employeeId
+    </select>
+    <!--    新添员工-->
+    <!--    <resultMap id="AddEmployee" type="com.xb.pojo.Employee">-->
+    <!--        <id property="employeeId" column="employeeId" />-->
+    <!--        <result property="employeeName" column="employeeName" />-->
+    <!--    </resultMap>-->
+    <insert id="addEmployee" parameterType="Map" useGeneratedKeys="true" keyProperty="employeeId">
+        insert into employee
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <!--            <if test="employeeId != null">-->
+            <!--                employeeId,-->
+            <!--            </if>-->
+            <if test="employeeName != null">
+                employeeName,
+            </if>
+            <if test="employeeSex != null">
+                employeeSex,
+            </if>
+            <if test="employeeAge != null">
+                employeeAge,
+            </if>
+            <if test="employeePolitical != null">
+                employeePolitical,
+            </if>
+            <if test="employeeMarriage != null">
+                employeeMarriage,
+            </if>
+            <if test="employeeStatus != null">
+                employeeStatus,
+            </if>
+            <if test="employeeNation != null">
+                employeeNation,
+            </if>
+            <if test="employeeEducation != null">
+                employeeEducation,
+            </if>
+            <if test="employeeGraduation != null">
+                employeeGraduation,
+            </if>
+            <if test="employeeBirth != null">
+                employeeBirth,
+            </if>
+            <if test="employeePid != null">
+                employeePid,
+            </if>
+            <if test="userPhone != null">
+                userPhone,
+            </if>
+            <if test="employeeEmail != null">
+                employeeEmail,
+            </if>
+            <if test="employeeResidence != null">
+                employeeResidence,
+            </if>
+            <if test="employeeAddress != null">
+                employeeAddress,
+            </if>
+            <if test="employeeStartTime != null">
+                employeeStartTime,
+            </if>
+            <if test="employeeEndTime != null">
+                employeeEndTime,
+            </if>
+            <if test="employeePosition != null">
+                employeePosition,
+            </if>
+            <if test="employeeBoss != null">
+                employeeBoss,
+            </if>
+            <if test="departmentId != null">
+                departmentId,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <!--            <if test="employeeId != null">-->
+            <!--                #{employeeId},-->
+            <!--            </if>-->
+            <if test="employeeName != null">
+                #{employeeName},
+            </if>
+            <if test="employeeSex != null">
+                #{employeeSex},
+            </if>
+            <if test="employeeAge != null">
+                #{employeeAge},
+            </if>
+            <if test="employeePolitical != null">
+                #{employeePolitical},
+            </if>
+            <if test="employeeMarriage != null">
+                #{employeeMarriage},
+            </if>
+            <if test="employeeStatus != null">
+                #{employeeStatus},
+            </if>
+            <if test="employeeNation != null">
+                #{employeeNation},
+            </if>
+            <if test="employeeEducation != null">
+                #{employeeEducation},
+            </if>
+            <if test="employeeGraduation != null">
+                #{employeeGraduation},
+            </if>
+            <if test="employeeBirth != null">
+                #{employeeBirth},
+            </if>
+            <if test="employeePid != null">
+                #{employeePid},
+            </if>
+            <if test="userPhone != null">
+                #{userPhone},
+            </if>
+            <if test="employeeEmail != null">
+                #{employeeEmail},
+            </if>
+            <if test="employeeResidence != null">
+                #{employeeResidence},
+            </if>
+            <if test="employeeAddress != null">
+                #{employeeAddress},
+            </if>
+            <if test="employeeStartTime != null">
+                #{employeeStartTime},
+            </if>
+            <if test="employeeEndTime != null">
+                #{employeeEndTime},
+            </if>
+            <if test="employeePosition != null">
+                #{employeePosition},
+            </if>
+            <if test="employeeBoss != null">
+                #{employeeBoss},
+            </if>
+            <if test="departmentId != null">
+                #{departmentId},
+            </if>
+        </trim>
+    </insert>
+    <insert id="addUserEmployee" parameterType="Map">
+        insert into user_employee
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userIdOne != null">
+                userIdOne,
+            </if>
+            <if test="employeeIdOne != null">
+                employeeIdOne,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userIdOne != null">
+                #{userIdOne},
+            </if>
+            <if test="employeeIdOne != null">
+                #{employeeIdOne},
+            </if>
+        </trim>
+    </insert>
+    <!--修改员工部门-->
+    <update id="updateEmployeeDepartment" parameterType="Map">
+        update employee set departmentId = #{newDepartmentId}
+        where departmentId = #{departmentId}
+    </update>
+    <!--    修改员工-->
+    <update id="updateEmployee" parameterType="Map">
+        update employee
+        <trim prefix="set" suffixOverrides=",">
+            <if test="employeeName != null">
+                employeeName = #{employeeName},
+            </if>
+            <if test="employeeSex != null">
+                employeeSex = #{employeeSex},
+            </if>
+            <if test="employeeAge != null">
+                employeeAge = #{employeeAge},
+            </if>
+            <if test="employeePolitical != null">
+                employeePolitical = #{employeePolitical},
+            </if>
+            <if test="employeeMarriage != null">
+                employeeMarriage = #{employeeMarriage},
+            </if>
+            <if test="employeeStatus != null">
+                employeeStatus = #{employeeStatus},
+            </if>
+            <if test="employeeNation != null">
+                employeeNation = #{employeeNation},
+            </if>
+            <if test="employeeEducation != null">
+                employeeEducation = #{employeeEducation},
+            </if>
+            <if test="employeeGraduation != null">
+                employeeGraduation = #{employeeGraduation},
+            </if>
+            <if test="employeeBirth != null">
+                employeeBirth = #{employeeBirth},
+            </if>
+            <if test="employeePid != null">
+                employeePid = #{employeePid},
+            </if>
+            <if test="employeePhone != null">
+                employeePhone = #{employeePhone},
+            </if>
+            <if test="employeeEmail != null">
+                employeeEmail = #{employeeEmail},
+            </if>
+            <if test="employeeResidence != null">
+                employeeResidence = #{employeeResidence},
+            </if>
+            <if test="employeeAddress != null">
+                employeeAddress = #{employeeAddress},
+            </if>
+            <if test="employeeStartTime != null">
+                employeeStartTime = #{employeeStartTime},
+            </if>
+            <if test="employeeEndTime != null">
+                employeeEndTime = #{employeeEndTime},
+            </if>
+            <if test="employeePosition != null">
+                employeePosition = #{employeePosition},
+            </if>
+            <if test="employeeBoss != null">
+                employeeBoss = #{employeeBoss},
+            </if>
+            <if test="departmentId != null">
+                departmentId = #{departmentId},
+            </if>
+        </trim>
+        where employeeId = #{employeeId}
+    </update>
+    <!--    删除员工-->
+    <delete id="deleteEmployee" parameterType="Integer[]">
+        delete from employee where employeeId  in
+        <foreach collection="array" item="employeeId" open="("
+                 separator="," close=")">
+            #{employeeId}
+        </foreach>
+    </delete>
+</mapper>

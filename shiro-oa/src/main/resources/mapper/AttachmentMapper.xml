@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.AttachmentMapper">
+
+    <insert id="addAttachment" parameterType="Map" useGeneratedKeys="true" keyProperty="attachmentId">
+        insert into attachment
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="UUID != null">
+                UUID,
+            </if>
+            <if test="attachmentName != null">
+                attachmentName,
+            </if>
+            <if test="attachmentUrl != null">
+                attachmentUrl,
+            </if>
+            <if test="documentId != null">
+                documentId,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="UUID != null">
+                #{UUID},
+            </if>
+            <if test="attachmentName != null">
+                #{attachmentName},
+            </if>
+            <if test="attachmentUrl != null">
+                #{attachmentUrl},
+            </if>
+            <if test="documentId != null">
+                #{documentId},
+            </if>
+        </trim>
+    </insert>
+    <select id="queryAttachment" resultType="Attachment" parameterType="Map">
+        select * from attachment
+        <where>
+            <if test="attachmentId != null">
+                attachmentId = #{attachmentId}
+            </if>
+            <if test="attachmentUrl != null">
+                and attachmentUrl = #{attachmentUrl}
+            </if>
+            <if test="documentId != null">
+                and documentId = #{documentId}
+            </if>
+        </where>
+    </select>
+    <update id="updateAttachment" parameterType="Map">
+        update attachment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="attachmentName != null">
+                attachmentName = #{attachmentName},
+            </if>
+            <if test="attachmentUrl != null">
+                attachmentUrl = #{attachmentUrl},
+            </if>
+            <if test="documentId != null">
+                documentId = #{documentId},
+            </if>
+        </trim>
+        where attachmentId = #{attachmentId}
+    </update>
+    <delete id="deleteCompanyCard" parameterType="Map">
+        delete from attachment
+        <where>
+            <if test="attachmentId != null">
+                attachmentId = #{attachmentId}
+            </if>
+            <if test="attachmentName != null">
+                and attachmentName = #{attachmentName}
+            </if>
+            <if test="attachmentUrl != null">
+                and attachmentUrl = #{attachmentUrl}
+            </if>
+            <if test="documentId != null">
+                and documentId = #{documentId}
+            </if>
+        </where>
+    </delete>
+
+</mapper>

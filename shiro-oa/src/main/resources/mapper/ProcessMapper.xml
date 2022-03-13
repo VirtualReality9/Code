@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.ProcessMapper">
+
+    <!--查询全流程-->
+    <select id="queryProcessList" parameterType="Integer" resultType="Process">
+        select * from employee_document ed, process p
+        where ed.processId = p.processId and documentId = #{documentId}
+        order by p.processOrder
+    </select>
+
+    <!--查询流程-->
+    <select id="queryProcessById" resultType="Integer" parameterType="Integer">
+        select * from process where processId = #{processId}
+    </select>
+
+    <!--增加流程-->
+    <insert id="addProcess" parameterType="Map" useGeneratedKeys="true" keyProperty="processId">
+        insert into process
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="processName != null">
+                processName,
+            </if>
+            <if test="processCreateTime != null">
+                processCreateTime,
+            </if>
+            <if test="processStatus != null">
+                processStatus,
+            </if>
+            <if test="processNote != null">
+                processNote,
+            </if>
+            <if test="processTime != null">
+                processTime,
+            </if>
+            <if test="processEmployeeName != null">
+                processEmployeeName,
+            </if>
+            <if test="processOrder != null">
+                processOrder,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="processName != null">
+                #{processName},
+            </if>
+            <if test="processCreateTime != null">
+                #{processCreateTime},
+            </if>
+            <if test="processStatus != null">
+                #{processStatus},
+            </if>
+            <if test="processNote != null">
+                #{processNote},
+            </if>
+            <if test="processTime != null">
+                #{processTime},
+            </if>
+            <if test="processEmployeeName != null">
+                #{processEmployeeName},
+            </if>
+            <if test="processOrder != null">
+                #{processOrder},
+            </if>
+        </trim>
+    </insert>
+    <!--修改Role-->
+    <update id="updateProcess" parameterType="Map">
+        update process
+        <trim prefix="set" suffixOverrides=",">
+            <if test="processName != null">
+                processName = #{processName},
+            </if>
+            <if test="processCreateTime != null">
+                processCreateTime = #{processCreateTime},
+            </if>
+            <if test="processStatus != null">
+                processStatus = #{processStatus},
+            </if>
+            <if test="processNote != null">
+                processNote = #{processNote},
+            </if>
+            <if test="processTime != null">
+                processTime = #{processTime},
+            </if>
+            <if test="processEmployeeName != null">
+                processEmployeeName = #{processEmployeeName},
+            </if>
+            <if test="processOrder != null">
+                processOrder = #{processOrder},
+            </if>
+        </trim>
+        where processId = #{processId}
+    </update>
+    <!--删除流程-->
+    <delete id="deleteProcess" parameterType="Integer[]">
+        delete from process where processId in
+        <foreach collection="array" item="roleId" open="("
+                 separator="," close=")">
+            #{processId}
+        </foreach>
+    </delete>
+</mapper>

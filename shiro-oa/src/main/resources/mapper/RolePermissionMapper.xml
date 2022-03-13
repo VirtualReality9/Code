@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.RolePermissionMapper">
+<!--    查询角色权限-->
+    <resultMap id="QueryRolePermission" type="RolePermission">
+        <id property="roleId" column="roleId" />
+        <result property="roleName" column="roleName" />
+        <collection property="permissionList" ofType="Permission">
+            <id property="permissionId" column="permissionId" />
+            <result property="permissionName" column="permissionName" />
+        </collection>
+    </resultMap>
+    <select id="queryRolePermission" resultMap="QueryRolePermission">
+        select * from role r, role_permission rp, permission p
+        where r.roleId = rp.roleId and rp.permissionId = p.permissionId
+        order by r.roleId, p.permissionId
+    </select>
+<!--    增加角色权限-->
+    <insert id="addRolePermission" parameterType="Map">
+        insert into role_permission values (null,#{roleId},#{permissionId})
+    </insert>
+    <insert id="addRoleNavigationBar" parameterType="Map">
+        insert into role_navigationbar2 values (null,#{roleId},#{nbid})
+    </insert>
+<!--    修改角色权限-->
+    <update id="updateRolePermission" parameterType="Map">
+        update role_permission
+        <trim prefix="set" suffixOverrides=",">
+            <if test="roleId != null">
+                roleId = #{roleId},
+            </if>
+            <if test="permissionId != null">
+                permissionId = #{permissionId}
+            </if>
+        </trim>
+        where id = #{id}
+    </update>
+<!--    删除角色权限-->
+    <delete id="deleteRolePermission" parameterType="Integer">
+        delete from role_permission where roleId = #{roleId}
+    </delete>
+    <delete id="deleteRoleNavigationBar" parameterType="Integer">
+        delete from role_navigationbar2 where roleId = #{roleId}
+    </delete>
+</mapper>

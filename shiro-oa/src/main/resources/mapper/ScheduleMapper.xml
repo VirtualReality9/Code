@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.ScheduleMapper">
+
+    <!-- 自定义结果映射 -->
+<!--    <resultMap type="com.unexpect.oa.pojo.Employee" id="Schedule_MAP">-->
+<!--        <id property="employeeId" column="employeeId"/>-->
+<!--&lt;!&ndash;        <result property="employeeName" column="employeeName"/>&ndash;&gt;-->
+<!--        &lt;!&ndash; 多表关联映射 &ndash;&gt;-->
+<!--        <collection property="Schedule" ofType="com.unexpect.oa.pojo.Schedule">-->
+<!--            <id property="scheduleId" column="scheduleId" />-->
+<!--            <result property="scheduleTime" column="scheduleTime" />-->
+<!--            <result property="schedulePlace" column="schedulePlace" />-->
+<!--            <result property="scheduleProfile" column="scheduleProfile" />-->
+<!--            <result property="scheduleNote" column="scheduleNote" />-->
+<!--            <result property="scheduleTheme" column="scheduleTheme" />-->
+<!--            <result property="scheduleLabel" column="scheduleLabel" />-->
+<!--            <result property="scheduleStatus" column="scheduleStatus" />-->
+<!--            <result property="scheduleCreater" column="scheduleCreater" />-->
+<!--            <result property="scheduleLeader" column="scheduleLeader" />-->
+<!--            <result property="scheduleStartTime" column="scheduleStartTime" />-->
+<!--            <result property="scheduleEndTime" column="scheduleEndTime" />-->
+<!--        </collection>-->
+<!--    </resultMap>-->
+    <select id="getScheduleByEmployeeId" resultType="Schedule" parameterType="map">
+        select b.scheduleId,scheduleTime,schedulePlace,scheduleProfile,scheduleNote,scheduleTheme,scheduleLabel,scheduleStatus,scheduleCreater,scheduleLeader,scheduleStartTime,scheduleEndTime
+        from oa.schedule b,oa.schedule_employeeid c
+        where  b.scheduleId=c.scheduleId and c.employeeId=#{employeeId}
+        order by scheduleId desc
+        limit ${(pageNum - 1) * pageSize},#{pageSize};
+    </select>
+    <select id="getOneEmployeeScheduleDetail" resultType="Schedule" parameterType="map">
+        select * from
+        from oa.schedule b,oa.schedule_employeeid c
+        where  b.scheduleId=c.scheduleId and c.employeeId=#{employeeId}
+        order by scheduleId desc
+        limit ${(pageNum - 1) * pageSize},#{pageSize};
+    </select>
+    <select id="queryScheduleList" resultType="Schedule" parameterType="map">
+        select distinct c.status,b.scheduleId,scheduleTime,schedulePlace,scheduleProfile,scheduleNote,scheduleTheme,scheduleLabel,scheduleCreater,scheduleLeader,scheduleStartTime,scheduleEndTime
+        from oa.schedule b,oa.schedule_employeeid c
+        where  b.scheduleId=c.scheduleId
+        <if test="employeeId != null">
+            and c.employeeId=#{employeeId}
+        </if>
+        <if test="nowDate != null">
+            <if test="status != null" >
+                and b.scheduleId in(
+                select scheduleId from schedule where scheduleEndTime &lt; #{nowDate}
+                union select scheduleId from schedule_employeeid where status = #{status} and employeeId = #{employeeId})
+            </if>
+            <if test="status == null">
+                and scheduleEndTime >= #{nowDate}
+                and c.status = 0
+            </if>
+        </if>
+        order by scheduleStartTime
+        <if test="pagenum != null">
+            <if test="pagesize != null">
+                limit ${(pagenum - 1) * pagesize},#{pagesize};
+            </if>
+        </if>
+    </select>
+
+    <select id="queryEmployeeScheduleDetail" resultType= "EmployeeSchedule" parameterType="Map">
+        select * from schedule_employeeid
+        <where>
+            <if test="scheduleId != null">
+                and scheduleId = #{scheduleId}
+            </if>
+            <if test="employeeId != null">
+                and employeeId = #{employeeId}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryPublishScheduleList" resultType="Schedule" parameterType="map">
+        select * from schedule s where scheduleLeader = #{employeeId}
+        <if test="pagenum != null">
+            <if test="pagesize != null">
+                limit ${(pagenum - 1) * pagesize},#{pagesize};
+            </if>
+        </if>
+    </select>
+
+    <select id="countQuerySchedule" parameterType="Map" resultType="Integer">
+        select count(distinct b.scheduleId)
+        from oa.schedule b,oa.schedule_employeeid c
+        where  b.scheduleId=c.scheduleId
+        <if test="employeeId != null">
+            and c.employeeId=#{employeeId}
+        </if>
+        <if test="nowDate != null">
+            <if test="status != null" >
+                and b.scheduleId in(
+                select scheduleId from schedule where scheduleEndTime &lt; #{nowDate}
+                union select scheduleId from schedule_employeeid where status = #{status} and employeeId = #{employeeId})
+            </if>
+            <if test="status == null">
+                and scheduleEndTime > #{nowDate}
+                and c.status = 0
+            </if>
+        </if>
+    </select>
+    <select id="countPublicSchedule" parameterType="Map" resultType="Integer">
+        select count(*) from schedule s where scheduleLeader = #{employeeId}
+    </select>
+
+    <!--    动态添加-->
+    <insert id="addSchedule" parameterType="Map" useGeneratedKeys="true" keyProperty="scheduleId">
+        insert into schedule
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="scheduleTime != null">
+                scheduleTime,
+            </if>
+            <if test="schedulePlace != null">
+                schedulePlace,
+            </if>
+            <if test="scheduleProfile != null">
+                scheduleProfile,
+            </if>
+            <if test="scheduleNote != null">
+                scheduleNote,
+            </if>
+            <if test="scheduleTheme != null">
+                scheduleTheme,
+            </if>
+            <if test="scheduleLabel != null">
+                scheduleLabel,
+            </if>
+            <if test="scheduleStatus != null">
+                scheduleStatus,
+            </if>
+            <if test="createEmployeeName != null">
+                scheduleCreater,
+            </if>
+            <if test="createEmployeeId != null">
+                scheduleLeader,
+            </if>
+            <if test="scheduleStartTime != null">
+                scheduleStartTime,
+            </if>
+            <if test="scheduleEndTime != null">
+                scheduleEndTime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="scheduleTime != null">
+                #{scheduleTime},
+            </if>
+            <if test="schedulePlace != null">
+                #{schedulePlace},
+            </if>
+            <if test="scheduleProfile != null">
+                #{scheduleProfile},
+            </if>
+            <if test="scheduleNote != null">
+                #{scheduleNote},
+            </if>
+            <if test="scheduleTheme != null">
+                #{scheduleTheme},
+            </if>
+            <if test="scheduleLabel != null">
+                #{scheduleLabel},
+            </if>
+            <if test="scheduleStatus != null">
+                #{scheduleStatus},
+            </if>
+            <if test="createEmployeeName != null">
+                #{createEmployeeName},
+            </if>
+            <if test="createEmployeeId != null">
+                #{createEmployeeId},
+            </if>
+            <if test="scheduleStartTime != null">
+                #{scheduleStartTime},
+            </if>
+            <if test="scheduleEndTime != null">
+                #{scheduleEndTime},
+            </if>
+        </trim>
+    </insert>
+
+    <!--向schedule_employeeid表添加参加会议信息-->
+    <insert id="addScheduleEmployee" parameterType="Map">
+        insert into schedule_employeeid values(#{employeeId},#{scheduleId},#{status},#{employeeName},null)
+    </insert>
+    <!--员工提交表单修改schedule_employeeid表信息-->
+    <update id="updScheduleEmployee" parameterType="map">
+        update schedule_employeeid
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="scheduleContent != null">
+                scheduleContent = #{scheduleContent},
+            </if>
+        </trim>
+        where scheduleId = #{scheduleId} and employeeId = #{employeeId}
+    </update>
+
+    <!--动态修改-->
+    <update id="updSchedule" parameterType="map">
+        update schedule
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="scheduleTime != null">
+                scheduleTime = #{scheduleTime},
+            </if>
+            <if test="schedulePlace != null">
+                schedulePlace = #{schedulePlace},
+            </if>
+            <if test="scheduleProfile != null">
+                scheduleProfile = #{scheduleProfile},
+            </if>
+            <if test="scheduleNote != null">
+                scheduleNote = #{scheduleNote},
+            </if>
+            <if test="scheduleTheme != null">
+                scheduleTheme = #{scheduleTheme},
+            </if>
+            <if test="scheduleLabel != null">
+                scheduleLabel = #{scheduleLabel},
+            </if>
+            <if test="scheduleStatus != null">
+                scheduleStatus = #{scheduleStatus},
+            </if>
+            <if test="scheduleCreater != null">
+                scheduleCreater = #{employeeName},
+            </if>
+            <if test="scheduleLeader != null">
+                scheduleLeader = #{employeeId},
+            </if>
+            <if test="scheduleStartTime != null">
+                scheduleStartTime = #{scheduleStartTime},
+            </if>
+            <if test="scheduleEndTime != null">
+                scheduleEndTime = #{scheduleEndTime},
+            </if>
+        </trim>
+        where scheduleId = #{scheduleId}
+    </update>
+
+    <!-- 删除日程 -->
+    <delete id="delSchedule" parameterType="Integer">
+        delete from schedule where scheduleId=#{scheduleId}
+    </delete>
+
+    <!--删除联合表中的数据-->
+    <delete id="delScheduleEmployee" parameterType="Integer">
+        delete from schedule_employeeid
+        <where>
+            <if test="scheduleId!=null">
+                scheduleId=#{scheduleId}
+            </if>
+        </where>
+    </delete>
+<!--    &lt;!&ndash; 批量删除 &ndash;&gt;-->
+<!--    <delete id="delSchedule" parameterType="int[]">-->
+<!--        &lt;!&ndash; forEach : 用来循环 collection : 用来指定循环的数据的类型 可以填的值有：array,list,map item-->
+<!--            : 循环中为每个循环的数据指定一个别名 index : 循环中循环的下标 open : 开始 close : 结束 separator : 数组中元素之间的分隔符 &ndash;&gt;-->
+<!--        delete from oa.schedule where scheduleId in-->
+<!--        <foreach collection="array" item="scheduleId" index="no" open="("-->
+<!--                 separator="," close=")">-->
+<!--            #{scheduleId}-->
+<!--        </foreach>-->
+<!--    </delete>-->
+</mapper>

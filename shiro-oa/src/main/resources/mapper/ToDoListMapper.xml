@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.ToDoListMapper">
+    <!-- 自定义结果映射 -->
+    <resultMap type="Employee" id="ToDoList_MAP">
+        <id property="employeeId" column="employeeId"/>
+        <result property="employeeName" column="employeeName"/>
+        <!-- 多表关联映射 -->
+        <collection property="toDoList" ofType="ToDoList">
+            <id property="todoId" column="todoId" />
+            <result property="todoTime" column="todoTime" />
+            <result property="todoContent" column="todoContent" />
+            <result property="todoStatus" column="todoStatus" />
+            <result property="todoNote" column="todoNote" />
+        </collection>
+    </resultMap>
+    <select id="getToDoListByEmployeeId" resultMap="ToDoList_MAP" parameterType="Integer">
+        select b.employeeId,employeeName,todoId,todoTime,todoContent,todoStatus,todoNote
+        from oa.todo a,oa.employee b
+        where a.employeeId=b.employeeId and a.employeeId=#{employeeId}
+        order by b.employeeId,employeeName,todoId
+        <!--select * from oa.todo a,oa.employee b,oa.employee_todo c where a.todoId=#{todoId} and c.todoId=a.todoId and c.employeeId=b.departmentId-->
+    </select>
+
+    <select id="countAllToDoList" parameterType="Integer" resultType="Integer">
+        select count(*) from todo where employeeId=#{employeeId};
+    </select>
+
+<!--    动态添加-->
+    <insert id="addToDoList" parameterType="Map" >
+        insert into oa.todo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="todoTime != null">
+                todoTime,
+            </if>
+            <if test="todoContent != null">
+                todoContent,
+            </if>
+            <if test="todoStatus != null">
+                todoStatus,
+            </if>
+            <if test="todoNote != null">
+                todoNote,
+            </if>
+            <if test="employeeId != null">
+                employeeId,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="todoTime != null">
+                #{todoTime},
+            </if>
+            <if test="todoContent != null">
+                #{todoContent},
+            </if>
+            <if test="todoStatus != null">
+                #{todoStatus},
+            </if>
+            <if test="todoNote != null">
+                #{todoNote},
+            </if>
+            <if test="employeeId != null">
+                #{employeeId},
+            </if>
+        </trim>
+    </insert>
+
+    <!--动态修改-->
+    <update id="updToDoList" parameterType="map">
+        update oa.todo
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="todoStartTime != null">
+                todoStartTime = #{todoStartTime},
+            </if>
+            <if test="todoEndTime != null">
+                todoEndTime = #{todoEndTime},
+            </if>
+            <if test="todoContent != null">
+                todoContent = #{todoContent},
+            </if>
+            <if test="todoStatus != null">
+                todoStatus = #{todoStatus},
+            </if>
+            <if test="todoNote != null">
+                todoNote = #{todoNote},
+            </if>
+        </trim>
+        where todoId = #{todoId}
+    </update>
+
+    <!-- 动态删除 -->
+    <!-- 批量删除 -->
+    <delete id="delToDoList" parameterType="int[]">
+        <!-- forEach : 用来循环 collection : 用来指定循环的数据的类型 可以填的值有：array,list,map item
+            : 循环中为每个循环的数据指定一个别名 index : 循环中循环的下标 open : 开始 close : 结束 separator : 数组中元素之间的分隔符 -->
+        delete from oa.todo where todoId in
+        <foreach collection="array" item="todoId" index="no" open="("
+                 separator="," close=")">
+            #{todoId}
+        </foreach>
+    </delete>
+</mapper>

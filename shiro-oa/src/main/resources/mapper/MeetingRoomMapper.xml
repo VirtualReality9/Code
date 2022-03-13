@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.MeetingRoomMapper">
+
+    <!--用Map模糊查询会议-->
+    <select id="selectMeetingRoomByMap" parameterType="Map" resultType="MeetingRoom">
+        select * from meetingroom
+        <where>
+            <if test="meetingRoomId!=null">
+                meetingRoomId=#{meetingRoomId}
+            </if>
+            <if test="meetingRoomName!=null">
+                and meetingRoomName=#{meetingRoomName}
+            </if>
+            <if test="meetingRoomStatus!=null">
+                and meetingRoomStatus=#{meetingRoomStatus}
+            </if>
+        </where>
+    </select>
+    <!--<resultMap id="MEETING_ROOM_FACILITY" type="MeetingRoom">-->
+    <!--    <id property="meetingRoomId" column="meetingRoomId" />-->
+    <!--    <result property="departmentName" column="departmentName" />-->
+    <!--    <collection property="facilityList" ofType="Facility">-->
+    <!--        <id property="facilityId" column="facilityId" />-->
+    <!--        <result property="facilityName" column="facilityName" />-->
+    <!--        <result property="facilityStatus" column="facilityStatus" />-->
+    <!--    </collection>-->
+    <!--</resultMap>-->
+    <!--<select id="queryMeetingRoomFacilityById" parameterType="Map" resultType="MeetingRoom">-->
+    <!--    SELECT * FROM meetingroom m,facility f-->
+    <!--    where m.meetingRoomId = f.meetingRoomId and m.meetingRoomId = #{meetingRoomId}-->
+    <!--</select>-->
+
+
+    <!--插入会议室-->
+    <insert id="insertMeetingRoom" parameterType="Map">
+        insert into meetingroom
+        <trim prefix="(" suffixOverrides="," suffix=")" >
+            <if test="meetingRoomId!=null">
+                meetingRoomId,
+            </if>
+            <if test="meetingRoomName!=null">
+                meetingRoomName,
+            </if>
+            <if test="meetingRoomStatus!=null">
+                meetingRoomStatus,
+            </if>
+            <if test="computerStatus!=null">
+                computerStatus,
+            </if>
+            <if test="projectionStatus!=null">
+                projectionStatus,
+            </if>
+            <if test="airStatus!=null">
+                airStatus,
+            </if>
+            <if test="maxSize!=null">
+                maxSize,
+            </if>
+            <if test="meetingRoomStatus!=null">
+                one,
+            </if>
+            <if test="meetingRoomStatus!=null">
+                two,
+            </if>
+            <if test="meetingRoomStatus!=null">
+                three,
+            </if>
+            <if test="meetingRoomStatus!=null">
+                four,
+            </if>
+            <if test="meetingRoomStatus!=null">
+                five,
+            </if>
+        </trim>
+        values
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            <if test="meetingRoomId!=null">
+                #{meetingRoomId},
+            </if>
+            <if test="meetingRoomName!=null">
+                #{meetingRoomName},
+            </if>
+            <if test="meetingRoomStatus!=null">
+                #{meetingRoomStatus},
+            </if>
+            <if test="computerStatus!=null">
+                #{computerStatus},
+            </if>
+            <if test="projectionStatus!=null">
+                #{projectionStatus},
+            </if>
+            <if test="airStatus!=null">
+                #{airStatus},
+            </if>
+            <if test="maxSize!=null">
+                #{maxSize},
+            </if>
+            <if test="meetingRoomStatus!=null">
+                #{meetingRoomStatus},
+            </if>
+            <if test="meetingRoomStatus!=null">
+                #{meetingRoomStatus},
+            </if>
+            <if test="meetingRoomStatus!=null">
+                #{meetingRoomStatus},
+            </if>
+            <if test="meetingRoomStatus!=null">
+                #{meetingRoomStatus},
+            </if>
+            <if test="meetingRoomStatus!=null">
+                #{meetingRoomStatus},
+            </if>
+        </trim>
+    </insert>
+
+    <!--根据meetingRoomId删除会议室，慎用！！！！！！-->
+    <delete id="deleteMeetingRoom" parameterType="Integer[]">
+        delete from meetingroom
+        where
+        meetingRoomId in
+        <foreach collection="array" item="meetingRoomId" open="("
+                 separator="," close=")">
+            #{meetingRoomId}
+        </foreach>
+    </delete>
+
+    <!--更改会议室信息-->
+    <update id="updateMeetingRoom" parameterType="Map">
+        update meetingroom
+        <trim prefix="set" suffixOverrides=",">
+            <if test="meetingRoomName!=null">
+                meetingRoomName=#{meetingRoomName},
+            </if>
+            <if test="meetingRoomStatus!=null">
+                meetingRoomStatus=#{meetingRoomStatus},
+            </if>
+            <if test="computerStatus!=null">
+                computerStatus=#{computerStatus},
+            </if>
+            <if test="projectionStatus!=null">
+                projectionStatus=#{projectionStatus},
+            </if>
+            <if test="airStatus!=null">
+                airStatus=#{airStatus},
+            </if>
+            <if test="maxSize!=null">
+                maxSize=#{maxSize},
+            </if>
+            <if test="meetingRoomStatus!=null">
+                one = #{meetingRoomStatus},
+            </if>
+            <if test="meetingRoomStatus!=null">
+                two = #{meetingRoomStatus},
+            </if>
+            <if test="meetingRoomStatus!=null">
+                three = #{meetingRoomStatus},
+            </if>
+            <if test="meetingRoomStatus!=null">
+                four = #{meetingRoomStatus},
+            </if>
+            <if test="meetingRoomStatus!=null">
+                five = #{meetingRoomStatus},
+            </if>
+        </trim>
+        where meetingRoomId=#{meetingRoomId}
+    </update>
+</mapper>

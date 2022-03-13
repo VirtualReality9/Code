@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.unexpect.mapper.DocumentMapper">
+    <resultMap type="Document" id="DOCUMENT_MAP">
+        <id property="documentId" column="documentId" />
+        <result property="documentName" column="documentName" />
+        <result property="documentContent" column="documentContent" />
+        <result property="documentStatus" column="documentStatus" />
+        <result property="UUID" column="UUID" />
+        <result property="documentUrl" column="documentUrl" />
+        <result property="documentLabel" column="documentLabel" />
+        <result property="documentCollect" column="documentCollect" />
+        <result property="documentCreateTime" column="documentCreateTime" />
+        <result property="employeeId" column="employeeId" />
+        <result property="employeeName" column="employeeName" />
+        <result property="departmentId" column="departmentId" />
+        <result property="isPublic" column="isPublic" />
+    </resultMap>
+
+    <!--动态查询-->
+    <select id="getDocuments" resultMap="DOCUMENT_MAP" parameterType="map">
+        select * from document
+        <where>
+            <if test="documentId != null ">
+                documentId = #{documentId}
+            </if>
+            <if test="documentName != null">
+                AND documentName = #{documentName}
+            </if>
+            <if test="documentContent != null">
+                AND documentContent = #{documentContent}
+            </if>
+            <if test="documentCreateTime != null">
+                AND documentCreateTime = #{documentCreateTime}
+            </if>
+            <if test="documentStatus != null">
+                AND documentStatus = #{documentStatus}
+            </if>
+            <if test="documentEndTime != null">
+                AND documentEndTime = #{documentEndTime}
+            </if>
+            <if test="documentUrl != null">
+                AND documentUrl = #{documentUrl}
+            </if>
+            <if test="documentCollect != null">
+                AND documentCollect = #{documentCollect}
+            </if>
+            <if test="documentLabel != null">
+                AND documentLabel = #{documentLabel}
+            </if>
+            <if test="employeeId != null">
+                AND employeeId = #{employeeId}
+            </if>
+            <if test="employeeName != null">
+                AND employeeName = #{employeeName}
+            </if>
+            <if test="documentLabel != null">
+                AND documentLabel = #{documentLabel}
+            </if>
+            <if test="isPublic != null">
+                AND isPublic = #{isPublic}
+            </if>
+        </where>
+    </select>
+    <!--动态查询-->
+    <resultMap type="Document" id="EXAMINE_DOCUMENT_MAP">
+        <id property="documentId" column="documentId" />
+        <result property="documentName" column="documentName" />
+        <result property="documentContent" column="documentContent" />
+        <result property="documentStatus" column="documentStatus" />
+        <result property="documentUrl" column="documentUrl" />
+        <result property="documentLabel" column="documentLabel" />
+        <result property="documentCollect" column="documentCollect" />
+        <result property="documentCreateTime" column="documentCreateTime" />
+        <result property="employeeId" column="employeeId" />
+        <result property="employeeName" column="employeeName" />
+        <result property="departmentId" column="departmentId" />
+        <result property="isPublic" column="isPublic" />
+        <result property="UUID" column="UUID" />
+        <association property="process" javaType="Process">
+            <id property="processId" column="processId" />
+            <result property="processOrder" column="processOrder" />
+        </association>
+    </resultMap>
+    <select id="getEmployeeDocuments" resultMap="EXAMINE_DOCUMENT_MAP" parameterType="Integer">
+        select * from document d,employee_document ed,process p
+        where d.documentId = ed.documentId and p.processId = ed.processId and ed.processemployeeId = #{employeeId};
+    </select>
+
+    <!--动态添加-->
+    <insert id="addDocument" parameterType="map" useGeneratedKeys="true" keyProperty="documentId">
+        insert into document
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="documentName != null">
+                documentName,
+            </if>
+            <if test="documentContent != null">
+                documentContent,
+            </if>
+            <if test="documentCreateTime != null">
+                documentCreateTime,
+            </if>
+            <if test="documentStatus != null">
+                documentStatus,
+            </if>
+            <if test="documentEndTime != null">
+                documentEndTime,
+            </if>
+            <if test="documentUrl != null">
+                documentUrl,
+            </if>
+            <if test="UUID != null">
+                UUID,
+            </if>
+            <if test="documentCollect != null">
+                documentCollect,
+            </if>
+            <if test="documentLabel != null">
+                documentLabel,
+            </if>
+            <if test="employeeId != null">
+                employeeId,
+            </if>
+            <if test="employeeName != null">
+                employeeName,
+            </if>
+            <if test="departmentId != null">
+                departmentId,
+            </if>
+            <if test="isPublic != null">
+                isPublic,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="documentName != null">
+                #{documentName},
+            </if>
+            <if test="documentContent != null">
+                #{documentContent},
+            </if>
+            <if test="documentCreateTime != null">
+                #{documentCreateTime},
+            </if>
+            <if test="documentStatus != null">
+                #{documentStatus},
+            </if>
+            <if test="documentEndTime != null">
+                #{documentEndTime},
+            </if>
+            <if test="documentUrl != null">
+                #{documentUrl},
+            </if>
+            <if test="UUID != null">
+                #{UUID},
+            </if>
+            <if test="documentCollect != null">
+                #{documentCollect},
+            </if>
+            <if test="documentLabel != null">
+                #{documentLabel},
+            </if>
+            <if test="employeeId != null">
+                #{employeeId},
+            </if>
+            <if test="employeeName != null">
+                #{employeeName},
+            </if>
+            <if test="departmentId != null">
+                #{departmentId},
+            </if>
+            <if test="isPublic != null">
+                #{isPublic},
+            </if>
+        </trim>
+    </insert>
+
+    <!--动态修改-->
+    <update id="updDocumentById" parameterType="map">
+        update document
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="documentName != null">
+                documentName = #{documentName},
+            </if>
+            <if test="documentContent != null">
+                documentContent = #{documentContent},
+            </if>
+            <if test="documentCreateTime != null">
+                documentCreateTime = #{documentCreateTime},
+            </if>
+            <if test="documentStatus != null">
+                documentStatus = #{documentStatus},
+            </if>
+            <if test="documentEndTime != null">
+                documentEndTime = #{documentEndTime},
+            </if>
+            <if test="documentUrl != null">
+                documentUrl = #{documentUrl},
+            </if>
+            <if test="UUID != null">
+                UUID = #{UUID},
+            </if>
+            <if test="documentCollect != null">
+                documentCollect = #{documentCollect},
+            </if>
+            <if test="documentLabel != null">
+                documentLabel = #{documentLabel},
+            </if>
+            <if test="employeeId != null">
+                employeeId = #{employeeId},
+            </if>
+            <if test="employeeName != null">
+                employeeName = #{employeeName},
+            </if>
+            <if test="departmentId != null">
+                departmentId = #{departmentId},
+            </if>
+            <if test="isPublic != null">
+                isPublic = #{isPublic},
+            </if>
+        </trim>
+        where documentId = #{documentId}
+    </update>
+
+    <!-- 动态删除 -->
+    <!-- 批量删除 -->
+    <delete id="delDocuments" parameterType="int[]">
+        <!-- forEach : 用来循环 collection : 用来指定循环的数据的类型 可以填的值有：array,list,map item
+            : 循环中为每个循环的数据指定一个别名 index : 循环中循环的下标 open : 开始 close : 结束 separator : 数组中元素之间的分隔符 -->
+        delete from document where documentId in
+        <foreach collection="array" item="id" index="no" open="("
+                 separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
